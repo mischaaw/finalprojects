@@ -1,10 +1,12 @@
 name: Run Alpaca Trading Bot
 
 on:
-  push:
   schedule:
-    # Runs at 8:02 AM Central Time every day
-    - cron: '2 8 * * *'  # CRON expression in UTC (8:02 AM CT is 1:02 PM UTC)
+    # Start the bot at 8:02 AM CST (which is 1:02 PM UTC)
+    - cron: '2 13 * * 1-5'  # Runs Monday to Friday at 1:02 PM UTC (8:02 AM CST)
+    
+    # Stop the bot at 2:58 PM CST (which is 7:58 PM UTC)
+    - cron: '58 19 * * 1-5'  # Runs Monday to Friday at 7:58 PM UTC (2:58 PM CST)
 
   workflow_dispatch:  # Allows for manual trigger from GitHub UI
 
@@ -34,4 +36,3 @@ jobs:
     - name: Run the bot
       run: |
         python bot.py
-
