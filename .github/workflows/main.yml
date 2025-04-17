@@ -1,0 +1,37 @@
+name: Run Alpaca Trading Bot
+
+on:
+  push:
+  schedule:
+    # Runs at 8:02 AM Central Time every day
+    - cron: '2 8 * * *'  # CRON expression in UTC (8:02 AM CT is 1:02 PM UTC)
+
+  workflow_dispatch:  # Allows for manual trigger from GitHub UI
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install alpaca-trade-api python-dotenv
+
+    - name: Set up environment variables from GitHub secrets
+      run: |
+        echo "APCA_API_KEY_ID=${{ secrets.APCA_API_KEY_ID }}" >> $GITHUB_ENV
+        echo "APCA_API_SECRET_KEY=${{ secrets.APCA_API_SECRET_KEY }}" >> $GITHUB_ENV
+
+    - name: Run the bot
+      run: |
+        python bot.py
+
