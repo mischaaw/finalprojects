@@ -1,4 +1,0 @@
-Flask==2.2.5
-yfinance==0.2.30
-alpaca-trade-api==1.6.1
-openai==1.14.3
