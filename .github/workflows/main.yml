@@ -1,7 +1,7 @@
-name: Run Alpaca Trading Bot
+name: Run Alpaca Trading Bot (Market Hours Only - 1 Min Interval)
 
 on:
-  workflow_dispatch:  # Only manual trigger — will run continuously until cancelled
+  workflow_dispatch:  # Manual start — will run forever until stopped
 
 jobs:
   run-bot:
@@ -19,20 +19,54 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install alpaca-trade-api python-dotenv
+        pip install alpaca-trade-api python-dotenv pytz
 
-    - name: Set up environment variables from GitHub secrets
+    - name: Set environment variables from GitHub secrets
       run: |
         echo "APCA_API_KEY_ID=${{ secrets.APCA_API_KEY_ID }}" >> $GITHUB_ENV
         echo "APCA_API_SECRET_KEY=${{ secrets.APCA_API_SECRET_KEY }}" >> $GITHUB_ENV
 
-    - name: Run Alpaca Bot continuously
+    - name: Run Alpaca Bot every 1 minute during market hours
       run: |
-        echo "🔁 Starting infinite bot loop..."
-        while true; do
-          echo "⏱️ Running bot at $(date -u)"
-          python bot.py
+        echo "🚀 Starting Alpaca bot loop (1-minute interval during market hours: 8:30 AM–3:00 PM CST/CDT)"
+        cat <<EOF > run_during_market_hours.py
+import time
+from datetime import datetime
+import pytz
+import subprocess
 
-          echo "✅ Finished cycle at $(date -u). Sleeping for 5 minutes..."
-          sleep 300  # Wait 5 minutes before next run (adjust if needed)
-        done
+# Market hours in Central Time (CST/CDT)
+MARKET_OPEN = (8, 30)
+MARKET_CLOSE = (15, 0)
+CENTRAL = pytz.timezone("US/Central")
+
+def is_market_open_now():
+    now_central = datetime.now(CENTRAL)
+    weekday = now_central.weekday()  # 0 = Monday, 6 = Sunday
+    hour, minute = now_central.hour, now_central.minute
+
+    if weekday >= 5:
+        return False
+    if (hour, minute) < MARKET_OPEN or (hour, minute) >= MARKET_CLOSE:
+        return False
+    return True
+
+print("🟢 Bot loop started...")
+
+while True:
+    now = datetime.now(CENTRAL).strftime("%Y-%m-%d %I:%M %p %Z")
+    if is_market_open_now():
+        print(f"⏱️ {now} — Market is open. Running bot.py...")
+        result = subprocess.run(["python", "bot.py"])
+        if result.returncode == 0:
+            print("✅ bot.py ran successfully.")
+        else:
+            print(f"❌ bot.py exited with error code {result.returncode}")
+    else:
+        print(f"⏸️ {now} — Market is closed. Skipping.")
+
+    print("🕐 Sleeping for 1 minute...\n")
+    time.sleep(60)
+EOF
+
+        python run_during_market_hours.py
