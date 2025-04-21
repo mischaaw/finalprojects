@@ -2,13 +2,51 @@ name: Run Alpaca Trading Bot
 
 on:
   schedule:
-    # Start the bot at 8:31 AM CST (which is 1:31 PM UTC)
-    - cron: '31 13 * * 1-5'  # Runs Monday to Friday at 1:31 PM UTC (8:31 AM CST)
-    
-    # Stop the bot at 2:58 PM CST (which is 7:58 PM UTC)
-    - cron: '58 19 * * 1-5'  # Runs Monday to Friday at 7:58 PM UTC (2:58 PM CST)
+    # Try at 8:30 AM CST (13:30 UTC) and retry every 10 minutes until 2:50 PM CST (19:50 UTC)
+    - cron: '30 13 * * 1-5'  # 8:30 AM CST
+    - cron: '40 13 * * 1-5'  # 8:40 AM CST
+    - cron: '50 13 * * 1-5'  # 8:50 AM CST
+    - cron: '0 14 * * 1-5'   # 9:00 AM CST
+    - cron: '10 14 * * 1-5'
+    - cron: '20 14 * * 1-5'
+    - cron: '30 14 * * 1-5'
+    - cron: '40 14 * * 1-5'
+    - cron: '50 14 * * 1-5'
+    - cron: '0 15 * * 1-5'
+    - cron: '10 15 * * 1-5'
+    - cron: '20 15 * * 1-5'
+    - cron: '30 15 * * 1-5'
+    - cron: '40 15 * * 1-5'
+    - cron: '50 15 * * 1-5'
+    - cron: '0 16 * * 1-5'
+    - cron: '10 16 * * 1-5'
+    - cron: '20 16 * * 1-5'
+    - cron: '30 16 * * 1-5'
+    - cron: '40 16 * * 1-5'
+    - cron: '50 16 * * 1-5'
+    - cron: '0 17 * * 1-5'
+    - cron: '10 17 * * 1-5'
+    - cron: '20 17 * * 1-5'
+    - cron: '30 17 * * 1-5'
+    - cron: '40 17 * * 1-5'
+    - cron: '50 17 * * 1-5'
+    - cron: '0 18 * * 1-5'
+    - cron: '10 18 * * 1-5'
+    - cron: '20 18 * * 1-5'
+    - cron: '30 18 * * 1-5'
+    - cron: '40 18 * * 1-5'
+    - cron: '50 18 * * 1-5'
+    - cron: '0 19 * * 1-5'
+    - cron: '10 19 * * 1-5'
+    - cron: '20 19 * * 1-5'
+    - cron: '30 19 * * 1-5'
+    - cron: '40 19 * * 1-5'
+    - cron: '50 19 * * 1-5'  # Last run at 2:50 PM CST
 
-  workflow_dispatch:  # Allows for manual trigger from GitHub UI
+    # Optional: Stop bot at 2:58 PM CST
+    - cron: '58 19 * * 1-5'
+
+  workflow_dispatch:  # Allows manual run
 
 jobs:
   run-bot:
@@ -27,16 +65,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install alpaca-trade-api python-dotenv
-
-    - name: Check if the current date is after 04/21/2025
-      run: |
-        current_date=$(date +'%Y-%m-%d')
-        if [[ "$current_date" < "2025-04-21" ]]; then
-          echo "This workflow will not run until after April 21, 2025."
-          exit 0  # Exit the workflow without running further steps
-        else
-          echo "Current date is after April 21, 2025. Proceeding with bot execution."
-        fi
 
     - name: Set up environment variables from GitHub secrets
       run: |
