@@ -1,52 +1,7 @@
 name: Run Alpaca Trading Bot
 
 on:
-  schedule:
-    # Try at 8:30 AM CST (13:30 UTC) and retry every 10 minutes until 2:50 PM CST (19:50 UTC)
-    - cron: '30 13 * * 1-5'  # 8:30 AM CST
-    - cron: '40 13 * * 1-5'  # 8:40 AM CST
-    - cron: '50 13 * * 1-5'  # 8:50 AM CST
-    - cron: '0 14 * * 1-5'   # 9:00 AM CST
-    - cron: '10 14 * * 1-5'
-    - cron: '20 14 * * 1-5'
-    - cron: '30 14 * * 1-5'
-    - cron: '40 14 * * 1-5'
-    - cron: '50 14 * * 1-5'
-    - cron: '0 15 * * 1-5'
-    - cron: '10 15 * * 1-5'
-    - cron: '20 15 * * 1-5'
-    - cron: '30 15 * * 1-5'
-    - cron: '40 15 * * 1-5'
-    - cron: '50 15 * * 1-5'
-    - cron: '0 16 * * 1-5'
-    - cron: '10 16 * * 1-5'
-    - cron: '20 16 * * 1-5'
-    - cron: '30 16 * * 1-5'
-    - cron: '40 16 * * 1-5'
-    - cron: '50 16 * * 1-5'
-    - cron: '0 17 * * 1-5'
-    - cron: '10 17 * * 1-5'
-    - cron: '20 17 * * 1-5'
-    - cron: '30 17 * * 1-5'
-    - cron: '40 17 * * 1-5'
-    - cron: '50 17 * * 1-5'
-    - cron: '0 18 * * 1-5'
-    - cron: '10 18 * * 1-5'
-    - cron: '20 18 * * 1-5'
-    - cron: '30 18 * * 1-5'
-    - cron: '40 18 * * 1-5'
-    - cron: '50 18 * * 1-5'
-    - cron: '0 19 * * 1-5'
-    - cron: '10 19 * * 1-5'
-    - cron: '20 19 * * 1-5'
-    - cron: '30 19 * * 1-5'
-    - cron: '40 19 * * 1-5'
-    - cron: '50 19 * * 1-5'  # Last run at 2:50 PM CST
-
-    # Optional: Stop bot at 2:58 PM CST
-    - cron: '58 19 * * 1-5'
-
-  workflow_dispatch:  # Allows manual run
+  workflow_dispatch:  # Only manual trigger — will run continuously until cancelled
 
 jobs:
   run-bot:
@@ -71,6 +26,13 @@ jobs:
         echo "APCA_API_KEY_ID=${{ secrets.APCA_API_KEY_ID }}" >> $GITHUB_ENV
         echo "APCA_API_SECRET_KEY=${{ secrets.APCA_API_SECRET_KEY }}" >> $GITHUB_ENV
 
-    - name: Run the bot
+    - name: Run Alpaca Bot continuously
       run: |
-        python bot.py
+        echo "🔁 Starting infinite bot loop..."
+        while true; do
+          echo "⏱️ Running bot at $(date -u)"
+          python bot.py
+
+          echo "✅ Finished cycle at $(date -u). Sleeping for 5 minutes..."
+          sleep 300  # Wait 5 minutes before next run (adjust if needed)
+        done
