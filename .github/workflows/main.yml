@@ -26,11 +26,9 @@ jobs:
         echo "APCA_API_KEY_ID=${{ secrets.APCA_API_KEY_ID }}" >> $GITHUB_ENV
         echo "APCA_API_SECRET_KEY=${{ secrets.APCA_API_SECRET_KEY }}" >> $GITHUB_ENV
 
-    - name: Run Alpaca Bot every 1 minute during market hours
+    - name: Create and run Alpaca Bot script during market hours
       run: |
-        echo "🚀 Starting Alpaca bot loop (1-minute interval during market hours: 8:30 AM–3:00 PM CST/CDT)"
-        cat <<EOF > run_during_market_hours.py
-import time
+        echo 'import time
 from datetime import datetime
 import pytz
 import subprocess
@@ -45,10 +43,12 @@ def is_market_open_now():
     weekday = now_central.weekday()  # 0 = Monday, 6 = Sunday
     hour, minute = now_central.hour, now_central.minute
 
-    if weekday >= 5:
+    if weekday >= 5:  # Saturday or Sunday
         return False
+
     if (hour, minute) < MARKET_OPEN or (hour, minute) >= MARKET_CLOSE:
         return False
+
     return True
 
 print("🟢 Bot loop started...")
@@ -66,7 +66,6 @@ while True:
         print(f"⏸️ {now} — Market is closed. Skipping.")
 
     print("🕐 Sleeping for 1 minute...\n")
-    time.sleep(60)
-EOF
+    time.sleep(60)' > run_during_market_hours.py
 
         python run_during_market_hours.py
