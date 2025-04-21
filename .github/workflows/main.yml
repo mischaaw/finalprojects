@@ -32,14 +32,15 @@ jobs:
 
       - name: Run Alpaca Bot during market hours
         run: |
-          python -c "
-# The code now only executes the bot when the GitHub Actions cron triggers every minute
+          python -c '
+import os
 
-print('Running Alpaca bot during market hours...')
-result = os.system('python bot.py')  # Runs the bot.py script
+# Running Alpaca bot during market hours
+print("Running Alpaca bot during market hours...")
+result = os.system("python bot.py")  # Runs the bot.py script
 
 if result == 0:
-    print('✅ bot.py ran successfully.')
+    print("✅ bot.py ran successfully.")
 else:
-    print(f'❌ bot.py exited with error code {result}')
-          "
+    print(f"❌ bot.py exited with error code {result}")
+          '
