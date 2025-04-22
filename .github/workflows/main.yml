@@ -1,0 +1,48 @@
+name: Run Alpaca Trading Bot
+
+on:
+  schedule:
+    # Start the bot at 8:31 AM CST (which is 1:31 PM UTC)
+    - cron: '31 13 * * 1-5'  # Runs Monday to Friday at 1:31 PM UTC (8:31 AM CST)
+    
+    # Stop the bot at 2:58 PM CST (which is 7:58 PM UTC)
+    - cron: '58 19 * * 1-5'  # Runs Monday to Friday at 7:58 PM UTC (2:58 PM CST)
+
+  workflow_dispatch:  # Allows for manual trigger from GitHub UI
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install alpaca-trade-api python-dotenv
+
+    - name: Check if the current date is after 04/21/2025
+      run: |
+        current_date=$(date +'%Y-%m-%d')
+        if [[ "$current_date" < "2025-04-21" ]]; then
+          echo "This workflow will not run until after April 21, 2025."
+          exit 0  # Exit the workflow without running further steps
+        else
+          echo "Current date is after April 21, 2025. Proceeding with bot execution."
+        fi
+
+    - name: Set up environment variables from GitHub secrets
+      run: |
+        echo "APCA_API_KEY_ID=${{ secrets.APCA_API_KEY_ID }}" >> $GITHUB_ENV
+        echo "APCA_API_SECRET_KEY=${{ secrets.APCA_API_SECRET_KEY }}" >> $GITHUB_ENV
+
+    - name: Run the bot
+      run: |
+        python bot.py
