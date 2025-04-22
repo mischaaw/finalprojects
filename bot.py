@@ -74,6 +74,6 @@ def flip_coin_and_trade():
 try:
     while True:
         flip_coin_and_trade()
-        time.sleep(1)  # Adjusted to run every 1 second
+        time.sleep(60)  # Adjusted to run every 1 minute
 except KeyboardInterrupt:
     print("Trading bot stopped.")
