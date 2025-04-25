@@ -1,6 +1,7 @@
 name: Run Alpaca Trading Bot
 
 on:
+  push:
   schedule:
     # Start the bot at 8:31 AM CST (which is 1:31 PM UTC)
     - cron: '31 13 * * 1-5'  # Runs Monday to Friday at 1:31 PM UTC (8:31 AM CST)
